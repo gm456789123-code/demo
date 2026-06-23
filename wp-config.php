@@ -22,7 +22,7 @@
 // Reads from environment variables when set (Docker/EasyPanel), otherwise
 // falls back to the local XAMPP values below — local dev is unaffected.
 /** The name of the database for WordPress */
-define( 'DB_NAME', getenv( 'WORDPRESS_DB_NAME' ) ?: 'data' );
+define( 'DB_NAME', getenv( 'WORDPRESS_DB_NAME' ) ?: 'demo' );
 
 /** Database username */
 define( 'DB_USER', getenv( 'WORDPRESS_DB_USER' ) ?: 'mysql' );
@@ -31,7 +31,7 @@ define( 'DB_USER', getenv( 'WORDPRESS_DB_USER' ) ?: 'mysql' );
 define( 'DB_PASSWORD', getenv( 'WORDPRESS_DB_PASSWORD' ) ?: '' );
 
 /** Database hostname */
-define( 'DB_HOST', getenv( 'WORDPRESS_DB_HOST' ) ?: 'mysql' );
+define( 'DB_HOST', getenv( 'WORDPRESS_DB_HOST' ) ?: 'localhost' );
 
 /** Database charset to use in creating database tables. */
 define( 'DB_CHARSET', 'utf8mb4' );
