@@ -19,17 +19,19 @@
  */
 
 // ** Database settings - You can get this info from your web host ** //
+// Reads from environment variables when set (Docker/EasyPanel), otherwise
+// falls back to the local XAMPP values below — local dev is unaffected.
 /** The name of the database for WordPress */
-define( 'DB_NAME', 'data' );
+define( 'DB_NAME', getenv( 'WORDPRESS_DB_NAME' ) ?: 'data' );
 
 /** Database username */
-define( 'DB_USER', 'root' );
+define( 'DB_USER', getenv( 'WORDPRESS_DB_USER' ) ?: 'root' );
 
 /** Database password */
-define( 'DB_PASSWORD', '' );
+define( 'DB_PASSWORD', getenv( 'WORDPRESS_DB_PASSWORD' ) ?: '' );
 
 /** Database hostname */
-define( 'DB_HOST', 'localhost' );
+define( 'DB_HOST', getenv( 'WORDPRESS_DB_HOST' ) ?: 'localhost' );
 
 /** Database charset to use in creating database tables. */
 define( 'DB_CHARSET', 'utf8mb4' );
@@ -89,7 +91,15 @@ define( 'WP_DEBUG', false );
 
 /* Add any custom values between this line and the "stop editing" line. */
 
-
+// Optional: override the site URL via env vars (Docker/EasyPanel) instead of
+// editing the wp_options table by hand. Only takes effect when set — local
+// dev keeps using whatever is already saved in the database.
+if ( getenv( 'WORDPRESS_HOME' ) ) {
+	define( 'WP_HOME', getenv( 'WORDPRESS_HOME' ) );
+}
+if ( getenv( 'WORDPRESS_SITEURL' ) ) {
+	define( 'WP_SITEURL', getenv( 'WORDPRESS_SITEURL' ) );
+}
 
 /* That's all, stop editing! Happy publishing. */
 

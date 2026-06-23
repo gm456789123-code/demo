@@ -1,7 +1,9 @@
-wp-config.easypanel.example.php
+.git
 db_export.sql
-.zip
+wp-config.easypanel.example.php
 z.txt
 มั่ว.html
 AGENTS.md
 CLAUDE.md
+README.md
+.gitignore

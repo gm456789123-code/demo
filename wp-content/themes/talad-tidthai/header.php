@@ -38,8 +38,7 @@
               'theme_location' => 'primary',
               'container'      => false,
               'items_wrap'     => '%3$s',
-              'link_before'    => '',
-              'link_after'     => '',
+              'walker'         => new Talad_Tidthai_Nav_Walker(),
           ) );
           ?>
         <?php else : ?>
@@ -54,8 +53,14 @@
         <button class="hidden md:flex items-center gap-1 px-3 py-2 rounded-full border border-gray-200 text-sm font-medium text-gray-600">
           TH <span class="text-xs">▾</span>
         </button>
-        <a href="<?php echo esc_url( wp_login_url() ); ?>" class="hidden sm:inline-block px-4 py-2 rounded-full border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50">เข้าสู่ระบบ</a>
-        <a href="<?php echo esc_url( wp_registration_url() ); ?>" class="px-4 py-2 rounded-full text-sm font-semibold text-white" style="background:#1d4ed8;">สมัครสมาชิก</a>
+        <?php if ( is_user_logged_in() ) : ?>
+          <?php $dashboard_page = get_page_by_path( 'my-dashboard' ); ?>
+          <a href="<?php echo esc_url( $dashboard_page ? get_permalink( $dashboard_page ) : home_url( '/' ) ); ?>" class="hidden sm:inline-block px-4 py-2 rounded-full border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50">แดชบอร์ดของฉัน</a>
+          <a href="<?php echo esc_url( wp_logout_url( home_url( '/' ) ) ); ?>" class="px-4 py-2 rounded-full text-sm font-semibold text-white" style="background:#1d4ed8;">ออกจากระบบ</a>
+        <?php else : ?>
+          <a href="<?php echo esc_url( wp_login_url() ); ?>" class="hidden sm:inline-block px-4 py-2 rounded-full border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50">เข้าสู่ระบบ</a>
+          <a href="<?php echo esc_url( wp_registration_url() ); ?>" class="px-4 py-2 rounded-full text-sm font-semibold text-white" style="background:#1d4ed8;">สมัครสมาชิก</a>
+        <?php endif; ?>
       </div>
     </div>
   </header>

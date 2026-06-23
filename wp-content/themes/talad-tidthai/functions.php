@@ -3,6 +3,10 @@
  * Talad Tidthai theme bootstrap.
  */
 
+require get_template_directory() . '/inc/post-types.php';
+require get_template_directory() . '/inc/nav-walker.php';
+require get_template_directory() . '/inc/referral-system.php';
+
 function talad_tidthai_setup() {
 	add_theme_support( 'title-tag' );
 	add_theme_support( 'post-thumbnails' );

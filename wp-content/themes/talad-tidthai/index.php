@@ -78,45 +78,42 @@
   <section class="max-w-7xl mx-auto px-4 lg:px-8 mt-12">
     <div class="flex items-center justify-between mb-5">
       <h2 class="text-2xl font-extrabold" style="color:#13357a;">ที่ดินแนะนำ อัปเดตทุกวัน</h2>
-      <a href="#" class="text-sm font-semibold" style="color:#1d4ed8;">ดูทั้งหมด &rarr;</a>
+      <?php $latest_page = get_page_by_path( 'latest' ); ?>
+      <a href="<?php echo esc_url( $latest_page ? get_permalink( $latest_page ) : '#' ); ?>" class="text-sm font-semibold" style="color:#1d4ed8;">ดูทั้งหมด &rarr;</a>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <!-- card 1 -->
-      <article class="rounded-2xl overflow-hidden bg-white shadow-sm border border-gray-100">
-        <div class="relative h-44">
-          <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&h=400&fit=crop" class="w-full h-full object-cover" alt="">
-          <span class="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold text-white" style="background:#1aa260;">Chiang Mai</span>
-        </div>
-        <div class="p-4">
-          <p class="text-xs text-gray-400">ค่าคอมสูงสุด</p>
-          <p class="text-2xl font-extrabold" style="color:#1d4ed8;">2.4 <span class="text-base">ล้านบาท</span></p>
-          <p class="font-semibold mt-2">Townhome in Chiang Mai</p>
-        </div>
-      </article>
-      <!-- card 2 -->
-      <article class="rounded-2xl overflow-hidden bg-white shadow-sm border border-gray-100">
-        <div class="relative h-44">
-          <img src="https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=600&h=400&fit=crop" class="w-full h-full object-cover" alt="">
-          <span class="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold text-white" style="background:#1aa260;">Bangkok</span>
-        </div>
-        <div class="p-4">
-          <p class="text-xs text-gray-400">ค่าคอมสูงสุด</p>
-          <p class="text-2xl font-extrabold" style="color:#1d4ed8;">850,000 <span class="text-base">บาท</span></p>
-          <p class="font-semibold mt-2">Office Unit for Rent</p>
-        </div>
-      </article>
-      <!-- card 3 -->
-      <article class="rounded-2xl overflow-hidden bg-white shadow-sm border border-gray-100">
-        <div class="relative h-44">
-          <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=600&h=400&fit=crop" class="w-full h-full object-cover" alt="">
-          <span class="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold text-white" style="background:#1aa260;">Phuket</span>
-        </div>
-        <div class="p-4">
-          <p class="text-xs text-gray-400">ค่าคอมสูงสุด</p>
-          <p class="text-2xl font-extrabold" style="color:#1d4ed8;">4 <span class="text-base">ล้านบาท</span></p>
-          <p class="font-semibold mt-2">Pool Villa Phuket Seaview</p>
-        </div>
-      </article>
+      <?php
+      $land_query = new WP_Query( array(
+          'post_type'      => 'land_listing',
+          'posts_per_page' => 3,
+          'orderby'        => 'date',
+          'order'          => 'DESC',
+      ) );
+      ?>
+      <?php if ( $land_query->have_posts() ) : ?>
+        <?php while ( $land_query->have_posts() ) : $land_query->the_post(); ?>
+          <?php
+          $location   = get_post_meta( get_the_ID(), '_land_location', true );
+          $price      = get_post_meta( get_the_ID(), '_land_price', true );
+          $price_unit = get_post_meta( get_the_ID(), '_land_price_unit', true );
+          $price_unit = $price_unit ? $price_unit : 'ล้านบาท';
+          $image_url  = get_post_meta( get_the_ID(), '_land_image_url', true );
+          ?>
+          <article class="rounded-2xl overflow-hidden bg-white shadow-sm border border-gray-100">
+            <div class="relative h-44">
+              <img src="<?php echo esc_url( $image_url ); ?>" class="w-full h-full object-cover" alt="<?php the_title_attribute(); ?>">
+              <span class="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold text-white" style="background:#1aa260;"><?php echo esc_html( $location ); ?></span>
+            </div>
+            <div class="p-4">
+              <p class="text-xs text-gray-400">ค่าคอมสูงสุด</p>
+              <p class="text-2xl font-extrabold" style="color:#1d4ed8;"><?php echo esc_html( $price ); ?> <span class="text-base"><?php echo esc_html( $price_unit ); ?></span></p>
+              <p class="font-semibold mt-2"><?php the_title(); ?></p>
+            </div>
+          </article>
+        <?php endwhile; wp_reset_postdata(); ?>
+      <?php else : ?>
+        <p class="text-gray-400 col-span-1 md:col-span-3">ยังไม่มีประกาศที่ดิน — เพิ่มได้ที่เมนู "ที่ดิน" ใน wp-admin</p>
+      <?php endif; ?>
     </div>
   </section>
 
@@ -180,35 +177,37 @@
   <section class="max-w-7xl mx-auto px-4 lg:px-8 mt-12">
     <div class="flex items-center justify-between mb-5">
       <h2 class="text-2xl font-extrabold" style="color:#13357a;">ความต้องการที่ดิน (Buyer กำลังหา)</h2>
-      <a href="#" class="text-sm font-semibold" style="color:#1d4ed8;">ดูทั้งหมด &rarr;</a>
+      <?php $all_demand_page = get_page_by_path( 'all-demand' ); ?>
+      <a href="<?php echo esc_url( $all_demand_page ? get_permalink( $all_demand_page ) : '#' ); ?>" class="text-sm font-semibold" style="color:#1d4ed8;">ดูทั้งหมด &rarr;</a>
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-      <div class="bg-yellow-50 border border-yellow-100 rounded-xl p-4">
-        <p class="text-xs font-semibold mb-2" style="color:#1d4ed8;">&#9679; ระยอง</p>
-        <p class="text-sm">ต้องการที่ดิน 50-100 ไร่ ใกล้นิคมอุตสาหกรรมสำหรับโรงงานผลิต</p>
-        <p class="text-xs text-gray-400 mt-3">อัปเดต 2 ชม. ที่แล้ว</p>
-      </div>
-      <div class="bg-yellow-50 border border-yellow-100 rounded-xl p-4">
-        <p class="text-xs font-semibold mb-2" style="color:#1d4ed8;">&#9679; ชลบุรี</p>
-        <p class="text-sm">ต้องการที่ดิน 20-50 ไร่ ใกล้ท่าเรือแหลมฉบังสำหรับคลังสินค้า</p>
-        <p class="text-xs text-gray-400 mt-3">อัปเดต 4 ชม. ที่แล้ว</p>
-      </div>
-      <div class="bg-yellow-50 border border-yellow-100 rounded-xl p-4">
-        <p class="text-xs font-semibold mb-2" style="color:#1d4ed8;">&#9679; สมุทรปราการ</p>
-        <p class="text-sm">ต้องการที่ดิน 30-80 ไร่ บางนา-เทพารักษ์ สำหรับ Data Center</p>
-        <p class="text-xs text-gray-400 mt-3">อัปเดต 1 วัน ที่แล้ว</p>
-      </div>
-      <div class="bg-yellow-50 border border-yellow-100 rounded-xl p-4">
-        <p class="text-xs font-semibold mb-2" style="color:#1d4ed8;">&#9679; อยุธยา</p>
-        <p class="text-sm">ต้องการที่ดิน 100+ ไร่ ใกล้นิคมบางปะอินสำหรับโรงงาน</p>
-        <p class="text-xs text-gray-400 mt-3">อัปเดต 1 วัน ที่แล้ว</p>
-      </div>
+      <?php
+      $demand_query = new WP_Query( array(
+          'post_type'      => 'buyer_demand',
+          'posts_per_page' => 4,
+          'orderby'        => 'date',
+          'order'          => 'DESC',
+      ) );
+      ?>
+      <?php if ( $demand_query->have_posts() ) : ?>
+        <?php while ( $demand_query->have_posts() ) : $demand_query->the_post(); ?>
+          <?php $detail = get_post_meta( get_the_ID(), '_demand_detail', true ); ?>
+          <div class="bg-yellow-50 border border-yellow-100 rounded-xl p-4">
+            <p class="text-xs font-semibold mb-2" style="color:#1d4ed8;">&#9679; <?php the_title(); ?></p>
+            <p class="text-sm"><?php echo esc_html( $detail ); ?></p>
+            <p class="text-xs text-gray-400 mt-3">อัปเดต <?php echo esc_html( human_time_diff( get_the_time( 'U' ), current_time( 'timestamp' ) ) ); ?> ที่แล้ว</p>
+          </div>
+        <?php endwhile; wp_reset_postdata(); ?>
+      <?php else : ?>
+        <p class="text-gray-400 col-span-1 sm:col-span-2 lg:col-span-4">ยังไม่มีความต้องการที่ดิน — เพิ่มได้ที่เมนู "ความต้องการที่ดิน" ใน wp-admin</p>
+      <?php endif; ?>
       <div class="rounded-xl p-5 text-white flex flex-col justify-between" style="background:#13357a;">
         <div>
           <p class="font-extrabold text-lg leading-snug">ส่งที่ดินของคุณ</p>
           <p class="text-xs text-blue-100 mt-2">ให้ตรงกับความต้องการ เพื่อโอกาสปิดดีลไว</p>
         </div>
-        <button class="mt-4 w-full py-2 rounded-lg font-semibold text-sm" style="background:#1aa260;">ส่งข้อมูลที่ดินเลย</button>
+        <?php $submit_land_page = get_page_by_path( 'submit-land' ); ?>
+        <a href="<?php echo esc_url( $submit_land_page ? get_permalink( $submit_land_page ) : home_url( '/' ) ); ?>" class="mt-4 block text-center w-full py-2 rounded-lg font-semibold text-sm" style="background:#1aa260;">ส่งข้อมูลที่ดินเลย</a>
       </div>
     </div>
   </section>
@@ -217,85 +216,47 @@
   <section class="max-w-7xl mx-auto px-4 lg:px-8 mt-12">
     <div class="flex items-center justify-between mb-5">
       <h2 class="text-2xl font-extrabold" style="color:#13357a;">เสียงจากผู้แนะนำที่ดินของเรา (ได้รับค่าตอบแทนจริง)</h2>
-      <a href="#" class="text-sm font-semibold" style="color:#1d4ed8;">ดูทั้งหมด &rarr;</a>
+      <?php $all_testimonials_page = get_page_by_path( 'all-testimonials' ); ?>
+      <a href="<?php echo esc_url( $all_testimonials_page ? get_permalink( $all_testimonials_page ) : '#' ); ?>" class="text-sm font-semibold" style="color:#1d4ed8;">ดูทั้งหมด &rarr;</a>
     </div>
     <div class="flex gap-5 overflow-x-auto scrollbar-none pb-2">
-      <!-- testimonial 1 -->
-      <article class="min-w-[260px] rounded-2xl overflow-hidden bg-white shadow-sm border border-gray-100">
-        <div class="relative h-48">
-          <img src="https://i.pravatar.cc/300?img=12" class="w-full h-full object-cover" alt="">
-          <div class="absolute bottom-0 left-0 right-0 bg-white/95 p-2 m-2 rounded-lg">
-            <p class="text-[11px] text-gray-500">ตลาดที่ดินไทย.com ขอบคุณให้คุณ</p>
-            <p class="text-sm font-bold" style="color:#13357a;">คุณสมชาย ว.</p>
-            <p class="text-xs" style="color:#1aa260;">ได้รับค่าตอบแทน 2,400,000 บาท</p>
-          </div>
-        </div>
-        <div class="p-4">
-          <p class="text-sm text-gray-600">แนะนำที่ดินผืนแรก ได้รับค่าตอบแทนจริง 2.4 ล้านบาท</p>
-          <p class="font-extrabold mt-2" style="color:#1d4ed8;">2,400,000 บาท</p>
-          <span class="inline-flex items-center gap-1 text-xs text-green-600 mt-1">
-            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,12 9,17 20,6"/></svg>
-            ได้รับค่าตอบแทนแล้ว
-          </span>
-        </div>
-      </article>
-      <!-- testimonial 2 -->
-      <article class="min-w-[260px] rounded-2xl overflow-hidden bg-white shadow-sm border border-gray-100">
-        <div class="relative h-48">
-          <img src="https://i.pravatar.cc/300?img=47" class="w-full h-full object-cover" alt="">
-          <div class="absolute bottom-0 left-0 right-0 bg-white/95 p-2 m-2 rounded-lg">
-            <p class="text-[11px] text-gray-500">ตลาดที่ดินไทย.com ขอบคุณให้คุณ</p>
-            <p class="text-sm font-bold" style="color:#13357a;">คุณสุวรรณา ก.</p>
-            <p class="text-xs" style="color:#1aa260;">ได้รับค่าตอบแทน 850,000 บาท</p>
-          </div>
-        </div>
-        <div class="p-4">
-          <p class="text-sm text-gray-600">ส่งข้อมูลที่ดินเพียงไม่กี่แปลง ก็ได้รับค่าตอบแทนทันที</p>
-          <p class="font-extrabold mt-2" style="color:#1d4ed8;">850,000 บาท</p>
-          <span class="inline-flex items-center gap-1 text-xs text-green-600 mt-1">
-            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,12 9,17 20,6"/></svg>
-            ได้รับค่าตอบแทนแล้ว
-          </span>
-        </div>
-      </article>
-      <!-- testimonial 3 -->
-      <article class="min-w-[260px] rounded-2xl overflow-hidden bg-white shadow-sm border border-gray-100">
-        <div class="relative h-48">
-          <img src="https://i.pravatar.cc/300?img=33" class="w-full h-full object-cover" alt="">
-          <div class="absolute bottom-0 left-0 right-0 bg-white/95 p-2 m-2 rounded-lg">
-            <p class="text-[11px] text-gray-500">ตลาดที่ดินไทย.com ขอบคุณให้คุณ</p>
-            <p class="text-sm font-bold" style="color:#13357a;">คุณวฤพล อ.</p>
-            <p class="text-xs" style="color:#1aa260;">ได้รับค่าตอบแทน 4,000,000 บาท</p>
-          </div>
-        </div>
-        <div class="p-4">
-          <p class="text-sm text-gray-600">ได้ค่าตอบแทนจากดีลใหญ่ 4 ล้านบาท ภายในไม่กี่เดือน</p>
-          <p class="font-extrabold mt-2" style="color:#1d4ed8;">4,000,000 บาท</p>
-          <span class="inline-flex items-center gap-1 text-xs text-green-600 mt-1">
-            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,12 9,17 20,6"/></svg>
-            ได้รับค่าตอบแทนแล้ว
-          </span>
-        </div>
-      </article>
-      <!-- testimonial 4 -->
-      <article class="min-w-[260px] rounded-2xl overflow-hidden bg-white shadow-sm border border-gray-100">
-        <div class="relative h-48">
-          <img src="https://i.pravatar.cc/300?img=53" class="w-full h-full object-cover" alt="">
-          <div class="absolute bottom-0 left-0 right-0 bg-white/95 p-2 m-2 rounded-lg">
-            <p class="text-[11px] text-gray-500">ตลาดที่ดินไทย.com ขอบคุณให้คุณ</p>
-            <p class="text-sm font-bold" style="color:#13357a;">คุณชาติชัย ร.</p>
-            <p class="text-xs" style="color:#1aa260;">ได้รับค่าตอบแทน 1,200,000 บาท</p>
-          </div>
-        </div>
-        <div class="p-4">
-          <p class="text-sm text-gray-600">รายได้เสริมที่ทำหลังเลิกงาน และรับจริงอย่างต่อเนื่อง</p>
-          <p class="font-extrabold mt-2" style="color:#1d4ed8;">1,200,000 บาท</p>
-          <span class="inline-flex items-center gap-1 text-xs text-green-600 mt-1">
-            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,12 9,17 20,6"/></svg>
-            ได้รับค่าตอบแทนแล้ว
-          </span>
-        </div>
-      </article>
+      <?php
+      $testimonial_query = new WP_Query( array(
+          'post_type'      => 'testimonial',
+          'posts_per_page' => -1,
+          'orderby'        => 'date',
+          'order'          => 'DESC',
+      ) );
+      ?>
+      <?php if ( $testimonial_query->have_posts() ) : ?>
+        <?php while ( $testimonial_query->have_posts() ) : $testimonial_query->the_post(); ?>
+          <?php
+          $amount = get_post_meta( get_the_ID(), '_testimonial_amount', true );
+          $quote  = get_post_meta( get_the_ID(), '_testimonial_quote', true );
+          $photo  = get_post_meta( get_the_ID(), '_testimonial_photo_url', true );
+          ?>
+          <article class="min-w-[260px] rounded-2xl overflow-hidden bg-white shadow-sm border border-gray-100">
+            <div class="relative h-48">
+              <img src="<?php echo esc_url( $photo ); ?>" class="w-full h-full object-cover" alt="<?php the_title_attribute(); ?>">
+              <div class="absolute bottom-0 left-0 right-0 bg-white/95 p-2 m-2 rounded-lg">
+                <p class="text-[11px] text-gray-500"><?php bloginfo( 'name' ); ?> ขอบคุณให้คุณ</p>
+                <p class="text-sm font-bold" style="color:#13357a;"><?php the_title(); ?></p>
+                <p class="text-xs" style="color:#1aa260;">ได้รับค่าตอบแทน <?php echo esc_html( number_format_i18n( (float) $amount ) ); ?> บาท</p>
+              </div>
+            </div>
+            <div class="p-4">
+              <p class="text-sm text-gray-600"><?php echo esc_html( $quote ); ?></p>
+              <p class="font-extrabold mt-2" style="color:#1d4ed8;"><?php echo esc_html( number_format_i18n( (float) $amount ) ); ?> บาท</p>
+              <span class="inline-flex items-center gap-1 text-xs text-green-600 mt-1">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,12 9,17 20,6"/></svg>
+                ได้รับค่าตอบแทนแล้ว
+              </span>
+            </div>
+          </article>
+        <?php endwhile; wp_reset_postdata(); ?>
+      <?php else : ?>
+        <p class="text-gray-400">ยังไม่มีรีวิว — เพิ่มได้ที่เมนู "เสียงจากผู้แนะนำ" ใน wp-admin</p>
+      <?php endif; ?>
     </div>
   </section>
 
@@ -307,7 +268,7 @@
         <p class="text-sm text-blue-100 mt-1">มาร่วมสร้างรายได้ไปกับ<?php bloginfo( 'name' ); ?></p>
       </div>
       <div class="flex items-center gap-4">
-        <button class="px-6 py-3 rounded-lg font-bold text-white" style="background:#1aa260;">เข้าร่วมฟรีทันที<br><span class="text-xs font-normal">ไม่มีค่าใช้จ่าย</span></button>
+        <a href="<?php echo esc_url( is_user_logged_in() ? home_url( '/' ) : wp_registration_url() ); ?>" class="px-6 py-3 rounded-lg font-bold text-white text-center" style="background:#1aa260;">เข้าร่วมฟรีทันที<br><span class="text-xs font-normal">ไม่มีค่าใช้จ่าย</span></a>
         <div class="hidden sm:flex items-center gap-2">
           <div class="bg-white rounded-lg p-1.5 w-16 h-16 grid grid-cols-5 grid-rows-5 gap-px">
             <script>document.write(Array.from({length:25}).map(()=>`<span class="${Math.random()>0.45?'bg-black':'bg-white'} block"></span>`).join(''))</script>
